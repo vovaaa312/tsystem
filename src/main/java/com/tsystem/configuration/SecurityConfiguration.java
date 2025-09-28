@@ -29,10 +29,10 @@ public class SecurityConfiguration  {
 
 
     private static final String[] WHITE_LIST_URL = {
-            "/api/auth/**",
-            "/api/users/**",
-            "/api/expenses/**",
-            "/api/incomes/**"};
+            "/api/auth/register",
+            "/api/auth/login",
+            "/api/auth/request-password-reset",
+            "/api/auth/reset-password"};
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 

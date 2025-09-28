@@ -1,15 +1,16 @@
 package com.tsystem.controller;
 
-import com.tsystem.model.dto.LoginRequest;
-import com.tsystem.model.dto.RegisterRequest;
-import com.tsystem.model.dto.TokenResponse;
+import com.tsystem.exception.UnauthorizedException;
+import com.tsystem.model.dto.*;
+import com.tsystem.model.user.User;
 import com.tsystem.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -30,6 +31,24 @@ public class AuthController {
             @RequestBody LoginRequest loginRequest
     ) {
         return ResponseEntity.ok(authService.authenticate(loginRequest));
+    }
+    @PostMapping("/request-password-reset")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void requestReset(@RequestBody RequestPasswordReset req) {
+        authService.requestPasswordReset(req);
+    }
+    @PostMapping("/reset-password")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void resetPassword(@RequestBody ResetPassword req) {
+        authService.resetPassword(req);
+    }
+
+    @PostMapping("/change-password")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void changePassword(@RequestBody ChangePassword req,
+                               @AuthenticationPrincipal UserDetails principal) {
+        if (principal == null) throw new UnauthorizedException("Unauthorized");
+        authService.changePassword(req, principal.getUsername());
     }
 
 }
