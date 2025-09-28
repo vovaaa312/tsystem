@@ -1,0 +1,16 @@
+package com.tsystem.model.dto;
+
+import jakarta.validation.constraints.*;
+import lombok.*;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class LoginRequest {
+    @NotBlank
+    private String login;     // username или email
+
+    @NotBlank
+    private String password;
+}
