@@ -2,12 +2,13 @@ package com.tsystem.controller;
 
 import com.tsystem.exception.UnauthorizedException;
 import com.tsystem.model.dto.*;
-import com.tsystem.model.user.User;
+import com.tsystem.model.dto.request.LoginRequest;
+import com.tsystem.model.dto.request.RegisterRequest;
+import com.tsystem.model.dto.response.TokenResponse;
 import com.tsystem.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;

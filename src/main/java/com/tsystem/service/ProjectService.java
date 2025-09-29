@@ -4,17 +4,18 @@ import com.tsystem.exception.NotFoundException;
 import com.tsystem.model.Project;
 import com.tsystem.model.user.User;
 
-import com.tsystem.model.dto.ProjectCreateRequest;
-import com.tsystem.model.dto.ProjectUpdateRequest;
+import com.tsystem.model.dto.request.ProjectCreateRequest;
+import com.tsystem.model.dto.request.ProjectUpdateRequest;
 import com.tsystem.repository.ProjectRepository;
 import com.tsystem.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
+
+import com.tsystem.exception.ForbiddenException;
 
 @Service
 @RequiredArgsConstructor
@@ -23,13 +24,19 @@ public class ProjectService {
     private final ProjectRepository projects;
     private final UserRepository users;
 
-    private User byUsername(String username) throws ChangeSetPersister.NotFoundException {
-        return users.findByUsername(username).orElseThrow(ChangeSetPersister.NotFoundException::new);
+    private User me(String username) {
+        return users.findByUsername(username).orElseThrow(NotFoundException::new);
+    }
+
+    private Project mustOwnProject(UUID projectId, String username) {
+        Project p = projects.findById(projectId).orElseThrow(NotFoundException::new);
+        if (!p.getUser().getUsername().equals(username)) throw new ForbiddenException();
+        return p;
     }
 
     @Transactional
-    public Project create(ProjectCreateRequest req, String currentUsername) throws ChangeSetPersister.NotFoundException {
-        User owner = byUsername(currentUsername);
+    public Project create(ProjectCreateRequest req, String username) {
+        User owner = me(username);
         Project p = Project.builder()
                 .name(req.getName())
                 .description(req.getDescription())
@@ -39,20 +46,18 @@ public class ProjectService {
     }
 
     @Transactional(readOnly = true)
-    public List<Project> listMine(String currentUsername) throws ChangeSetPersister.NotFoundException {
-        User me = byUsername(currentUsername);
-        return projects.findByUserIdOrderByCreatedAtDesc(me.getId());
+    public List<Project> listMine(String username) {
+        return projects.findByUserIdOrderByCreatedAtDesc(me(username).getId());
     }
 
     @Transactional(readOnly = true)
-    public Project getMine(UUID id, String currentUsername) throws ChangeSetPersister.NotFoundException {
-        User me = byUsername(currentUsername);
-        return projects.findByIdAndUserId(id, me.getId()).orElseThrow(NotFoundException::new);
+    public Project getMine(UUID projectId, String username) {
+        return mustOwnProject(projectId, username);
     }
 
     @Transactional
-    public Project update(UUID id, ProjectUpdateRequest req, String currentUsername) throws ChangeSetPersister.NotFoundException {
-        Project p = getMine(id, currentUsername);
+    public Project update(UUID projectId, ProjectUpdateRequest req, String username) {
+        Project p = mustOwnProject(projectId, username);
         p.setName(req.getName());
         p.setDescription(req.getDescription());
         p.setStatus(req.getStatus());
@@ -60,8 +65,8 @@ public class ProjectService {
     }
 
     @Transactional
-    public void delete(UUID id, String currentUsername) throws ChangeSetPersister.NotFoundException {
-        Project p = getMine(id, currentUsername);
+    public void delete(UUID projectId, String username) {
+        Project p = mustOwnProject(projectId, username);
         projects.delete(p);
     }
 }

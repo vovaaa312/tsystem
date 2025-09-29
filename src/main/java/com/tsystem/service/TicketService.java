@@ -5,12 +5,11 @@ import com.tsystem.model.Project;
 import com.tsystem.model.Ticket;
 import com.tsystem.model.user.User;
 
-import com.tsystem.model.dto.TicketCreateRequest;
-import com.tsystem.model.dto.TicketUpdateRequest;
+import com.tsystem.model.dto.request.TicketCreateRequest;
+import com.tsystem.model.dto.request.TicketUpdateRequest;
 import com.tsystem.repository.ProjectRepository;
 import com.tsystem.repository.TicketRepository;
 import com.tsystem.repository.UserRepository;
-import jdk.jshell.spi.ExecutionControl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,24 +17,29 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
+import com.tsystem.exception.ForbiddenException;
+
 @Service
 @RequiredArgsConstructor
 public class TicketService {
 
-    private final TicketRepository ticketRepository;
-    private final ProjectRepository projectRepository;
-    private final UserRepository userRepository;
+    private final TicketRepository tickets;
+    private final ProjectRepository projects;
+    private final UserRepository users;
 
-    private User me(String username) { return userRepository.findByUsername(username).orElseThrow(NotFoundException::new); }
+    private Project mustOwnProject(UUID projectId, String username) {
+        Project p = projects.findById(projectId).orElseThrow(NotFoundException::new);
+        if (!p.getUser().getUsername().equals(username)) throw new ForbiddenException();
+        return p;
+    }
 
-    private Project ownedProject(UUID projectId, String username) {
-        User u = me(username);
-        return projectRepository.findByIdAndUserId(projectId, u.getId()).orElseThrow(NotFoundException::new);
+    private User me(String username) {
+        return users.findByUsername(username).orElseThrow(NotFoundException::new);
     }
 
     @Transactional
     public Ticket create(UUID projectId, TicketCreateRequest req, String username) {
-        Project p = ownedProject(projectId, username);
+        Project p = mustOwnProject(projectId, username);
         User author = me(username);
         Ticket t = Ticket.builder()
                 .name(req.getName())
@@ -45,20 +49,19 @@ public class TicketService {
                 .project(p)
                 .user(author)
                 .build();
-        return ticketRepository.save(t);
+        return tickets.save(t);
     }
 
     @Transactional(readOnly = true)
-    public List<Ticket> list(UUID projectId, String username) throws ExecutionControl.NotImplementedException {
-        Project p = ownedProject(projectId, username);
-        throw new ExecutionControl.NotImplementedException("Not Implemented Yet");
-//        return ticketRepository.findByProjectIdOrderByCreatedAtDesc(p.getId());
+    public List<Ticket> list(UUID projectId, String username) {
+        Project p = mustOwnProject(projectId, username);
+        return tickets.findByProjectIdOrderByCreatedAtDesc(p.getId());
     }
 
     @Transactional(readOnly = true)
     public Ticket get(UUID projectId, UUID ticketId, String username) {
-        Project p = ownedProject(projectId, username);
-        return ticketRepository.findByIdAndProjectId(ticketId, p.getId()).orElseThrow(NotFoundException::new);
+        Project p = mustOwnProject(projectId, username);
+        return tickets.findByIdAndProjectId(ticketId, p.getId()).orElseThrow(NotFoundException::new);
     }
 
     @Transactional
@@ -69,12 +72,12 @@ public class TicketService {
         t.setType(req.getType());
         t.setPriority(req.getPriority());
         t.setState(req.getState());
-        return ticketRepository.save(t);
+        return tickets.save(t);
     }
 
     @Transactional
     public void delete(UUID projectId, UUID ticketId, String username) {
         Ticket t = get(projectId, ticketId, username);
-        ticketRepository.delete(t);
+        tickets.delete(t);
     }
 }

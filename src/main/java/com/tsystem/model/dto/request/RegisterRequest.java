@@ -1,4 +1,4 @@
-package com.tsystem.model.dto;
+package com.tsystem.model.dto.request;
 
 import jakarta.validation.constraints.*;
 import lombok.*;

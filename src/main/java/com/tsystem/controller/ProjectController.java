@@ -1,13 +1,13 @@
 package com.tsystem.controller;
-import com.tsystem.exception.NotFoundException;
 import com.tsystem.model.Project;
 
-import com.tsystem.model.dto.ProjectCreateRequest;
-import com.tsystem.model.dto.ProjectUpdateRequest;
+import com.tsystem.model.dto.request.ProjectCreateRequest;
+import com.tsystem.model.dto.request.ProjectUpdateRequest;
+import com.tsystem.model.dto.response.ProjectResponse;
+import com.tsystem.model.mapper.ProjectMapper;
 import com.tsystem.service.ProjectService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,41 +17,47 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/projects")
 @RequiredArgsConstructor
+@RequestMapping("/api/projects")
 public class ProjectController {
 
-    private final ProjectService projectService;
+    private final ProjectService projects;
 
+    // GET /projects
     @GetMapping
-    public List<Project> list(@AuthenticationPrincipal UserDetails principal) throws ChangeSetPersister.NotFoundException {
-        return projectService.listMine(principal.getUsername());
+    public List<ProjectResponse> list(@AuthenticationPrincipal UserDetails principal) {
+        return projects.listMine(principal.getUsername())
+                .stream().map(ProjectMapper::toResponse).toList();
     }
 
+    // POST /projects
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Project create(@Valid @RequestBody ProjectCreateRequest req,
-                          @AuthenticationPrincipal UserDetails principal) throws NotFoundException, ChangeSetPersister.NotFoundException {
-        return projectService.create(req, principal.getUsername());
+    public ProjectResponse create(@Valid @RequestBody ProjectCreateRequest req,
+                                  @AuthenticationPrincipal UserDetails principal) {
+        return ProjectMapper.toResponse(projects.create(req, principal.getUsername()));
     }
 
+    // GET /projects/{projectId}
     @GetMapping("/{projectId}")
-    public Project get(@PathVariable UUID projectId,
-                       @AuthenticationPrincipal UserDetails principal) throws ChangeSetPersister.NotFoundException {
-        return projectService.getMine(projectId, principal.getUsername());
+    public ProjectResponse get(@PathVariable UUID projectId,
+                               @AuthenticationPrincipal UserDetails principal) {
+        return ProjectMapper.toResponse(projects.getMine(projectId, principal.getUsername()));
     }
 
+    // PUT /projects/{projectId}
     @PutMapping("/{projectId}")
-    public Project update(@PathVariable UUID projectId,
-                          @Valid @RequestBody ProjectUpdateRequest req,
-                          @AuthenticationPrincipal UserDetails principal) throws ChangeSetPersister.NotFoundException {
-        return projectService.update(projectId, req, principal.getUsername());
+    public ProjectResponse update(@PathVariable UUID projectId,
+                                  @Valid @RequestBody ProjectUpdateRequest req,
+                                  @AuthenticationPrincipal UserDetails principal) {
+        return ProjectMapper.toResponse(projects.update(projectId, req, principal.getUsername()));
     }
 
+    // DELETE /projects/{projectId}
     @DeleteMapping("/{projectId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable UUID projectId,
-                       @AuthenticationPrincipal UserDetails principal) throws ChangeSetPersister.NotFoundException {
-        projectService.delete(projectId, principal.getUsername());
+                       @AuthenticationPrincipal UserDetails principal) {
+        projects.delete(projectId, principal.getUsername());
     }
 }

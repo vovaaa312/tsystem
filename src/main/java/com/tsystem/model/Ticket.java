@@ -4,6 +4,8 @@ package com.tsystem.model;
 import com.tsystem.model.enums.*;
 import com.tsystem.model.user.User;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.OffsetDateTime;
@@ -24,24 +26,27 @@ public class Ticket {
     @EqualsAndHashCode.Include
     private UUID id;
 
+    @NotBlank
+    @Size(min = 1, max = 160)
     @Column(nullable = false, length = 160)
-    private String name; // = title в PDF
+    private String name; // title в ТЗ
 
     @Column(columnDefinition = "TEXT")
+    @Size(max = 10000)
     private String description;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 8)
-    private TicketType type;
+    private TicketType type;          // bug | feature | task
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 8)
-    private TicketPriority priority;
+    private TicketPriority priority;  // low | med | high
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 16)
     @Builder.Default
-    private TicketState state = TicketState.open;
+    private TicketState state = TicketState.open; // open | in_progress | done
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "author_id", nullable = false)
@@ -58,4 +63,5 @@ public class Ticket {
     @PrePersist
     void prePersist() {
         if (createdAt == null) createdAt = OffsetDateTime.now();
-    }}
+    }
+}

@@ -2,11 +2,12 @@ package com.tsystem.controller;
 
 
 import com.tsystem.model.Ticket;
-import com.tsystem.model.dto.TicketCreateRequest;
-import com.tsystem.model.dto.TicketUpdateRequest;
+import com.tsystem.model.dto.request.TicketCreateRequest;
+import com.tsystem.model.dto.request.TicketUpdateRequest;
+import com.tsystem.model.dto.response.TicketResponse;
+import com.tsystem.model.mapper.TicketMapper;
 import com.tsystem.service.TicketService;
 import jakarta.validation.Valid;
-import jdk.jshell.spi.ExecutionControl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,43 +18,49 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/projects/{projectId}/tickets")
 @RequiredArgsConstructor
+@RequestMapping("/api/projects/{projectId}/tickets")
 public class TicketController {
 
-    private final TicketService ticketService;
+    private final TicketService tickets;
 
+    // GET /projects/{projectId}/tickets
     @GetMapping
-    public List<Ticket> list(@PathVariable UUID projectId,
-                             @AuthenticationPrincipal UserDetails principal) throws ExecutionControl.NotImplementedException {
-        return ticketService.list(projectId, principal.getUsername());
+    public List<TicketResponse> list(@PathVariable UUID projectId,
+                                     @AuthenticationPrincipal UserDetails principal) {
+        return tickets.list(projectId, principal.getUsername())
+                .stream().map(TicketMapper::toResponse).toList();
     }
 
+    // POST /projects/{projectId}/tickets
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Ticket create(@PathVariable UUID projectId,
-                         @Valid @RequestBody TicketCreateRequest req,
-                         @AuthenticationPrincipal UserDetails principal) {
-        return ticketService.create(projectId, req, principal.getUsername());
+    public TicketResponse create(@PathVariable UUID projectId,
+                                 @Valid @RequestBody TicketCreateRequest req,
+                                 @AuthenticationPrincipal UserDetails principal) {
+        return TicketMapper.toResponse(tickets.create(projectId, req, principal.getUsername()));
     }
 
+    // GET /projects/{projectId}/tickets/{ticketId}
     @GetMapping("/{ticketId}")
-    public Ticket get(@PathVariable UUID projectId, @PathVariable UUID ticketId,
-                      @AuthenticationPrincipal UserDetails principal) {
-        return ticketService.get(projectId, ticketId, principal.getUsername());
+    public TicketResponse get(@PathVariable UUID projectId, @PathVariable UUID ticketId,
+                              @AuthenticationPrincipal UserDetails principal) {
+        return TicketMapper.toResponse(tickets.get(projectId, ticketId, principal.getUsername()));
     }
 
+    // PUT /projects/{projectId}/tickets/{ticketId}
     @PutMapping("/{ticketId}")
-    public Ticket update(@PathVariable UUID projectId, @PathVariable UUID ticketId,
-                         @Valid @RequestBody TicketUpdateRequest req,
-                         @AuthenticationPrincipal UserDetails principal) {
-        return ticketService.update(projectId, ticketId, req, principal.getUsername());
+    public TicketResponse update(@PathVariable UUID projectId, @PathVariable UUID ticketId,
+                                 @Valid @RequestBody TicketUpdateRequest req,
+                                 @AuthenticationPrincipal UserDetails principal) {
+        return TicketMapper.toResponse(tickets.update(projectId, ticketId, req, principal.getUsername()));
     }
 
+    // DELETE /projects/{projectId}/tickets/{ticketId}
     @DeleteMapping("/{ticketId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable UUID projectId, @PathVariable UUID ticketId,
                        @AuthenticationPrincipal UserDetails principal) {
-        ticketService.delete(projectId, ticketId, principal.getUsername());
+        tickets.delete(projectId, ticketId, principal.getUsername());
     }
 }

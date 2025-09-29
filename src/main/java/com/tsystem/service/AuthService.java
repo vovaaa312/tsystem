@@ -1,6 +1,9 @@
 package com.tsystem.service;
 
 
+import com.tsystem.model.dto.request.LoginRequest;
+import com.tsystem.model.dto.request.RegisterRequest;
+import com.tsystem.model.dto.response.TokenResponse;
 import com.tsystem.model.user.SystemRole;
 import com.tsystem.model.user.User;
 
