@@ -21,7 +21,6 @@ public class ApplicationConfiguration {
 
     private final UserRepository userRepository;
 
-    /** Достаём пользователя по username ИЛИ email */
     @Bean
     public UserDetailsService userDetailsService() {
         return usernameOrEmail -> userRepository.findByUsername(usernameOrEmail)

@@ -7,6 +7,7 @@ import com.tsystem.model.dto.request.TicketUpdateRequest;
 import com.tsystem.model.dto.response.TicketResponse;
 import com.tsystem.model.mapper.TicketMapper;
 import com.tsystem.service.TicketService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,8 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/projects/{projectId}/tickets")
+@SecurityRequirement(name = "bearerAuth")
+
 public class TicketController {
 
     private final TicketService tickets;

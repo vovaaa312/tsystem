@@ -6,6 +6,7 @@ import com.tsystem.model.dto.request.LoginRequest;
 import com.tsystem.model.dto.request.RegisterRequest;
 import com.tsystem.model.dto.response.TokenResponse;
 import com.tsystem.service.AuthService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,11 +34,13 @@ public class AuthController {
     ) {
         return ResponseEntity.ok(authService.authenticate(loginRequest));
     }
+
     @PostMapping("/request-password-reset")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void requestReset(@RequestBody RequestPasswordReset req) {
         authService.requestPasswordReset(req);
     }
+
     @PostMapping("/reset-password")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void resetPassword(@RequestBody ResetPassword req) {
@@ -45,6 +48,7 @@ public class AuthController {
     }
 
     @PostMapping("/change-password")
+    @SecurityRequirement(name = "bearerAuth")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void changePassword(@RequestBody ChangePassword req,
                                @AuthenticationPrincipal UserDetails principal) {

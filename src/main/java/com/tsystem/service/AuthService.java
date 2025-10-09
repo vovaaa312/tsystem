@@ -108,7 +108,7 @@ public class AuthService {
 
             u.setResetTokenId(tokenId);
             u.setResetCode(codeHash);
-            u.setResetCodeExp(OffsetDateTime.now().plusMinutes(10)); // TTL 10 мин
+            u.setResetCodeExp(OffsetDateTime.now().plusMinutes(10)); // TTL 10 min
 
             userRepository.save(u);
 

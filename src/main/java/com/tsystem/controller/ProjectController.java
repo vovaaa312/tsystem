@@ -1,4 +1,5 @@
 package com.tsystem.controller;
+
 import com.tsystem.model.Project;
 
 import com.tsystem.model.dto.request.ProjectCreateRequest;
@@ -6,6 +7,7 @@ import com.tsystem.model.dto.request.ProjectUpdateRequest;
 import com.tsystem.model.dto.response.ProjectResponse;
 import com.tsystem.model.mapper.ProjectMapper;
 import com.tsystem.service.ProjectService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,8 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/projects")
+@SecurityRequirement(name = "bearerAuth")
+
 public class ProjectController {
 
     private final ProjectService projects;
