@@ -61,8 +61,8 @@ public class AuthService {
         var user = User.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
-                .name(request.getName())         // важно, если NOT NULL
-                .surname(request.getSurname())   // важно, если NOT NULL
+                .name(request.getName())
+                .surname(request.getSurname())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(SystemRole.SYSTEM_USER)
                 .build();
@@ -84,8 +84,7 @@ public class AuthService {
                 .orElseGet(() -> userRepository.findByEmail(request.getLogin())
                         .orElseThrow(() -> new IllegalArgumentException("Invalid credentials")));
 
-        // проверка пароля и создание SecurityContext — через AuthenticationManager
-        //
+
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(user.getUsername(), request.getPassword())
         );
@@ -103,8 +102,8 @@ public class AuthService {
 
         opt.ifPresent(u -> {
             UUID tokenId = UUID.randomUUID();
-            String code = generateNumericCode(8);                 // 8 цифр
-            String codeHash = passwordEncoder.encode(code);       // в БД хэш
+            String code = generateNumericCode(8);
+            String codeHash = passwordEncoder.encode(code);
 
             u.setResetTokenId(tokenId);
             u.setResetCode(codeHash);

@@ -9,7 +9,7 @@ import lombok.*;
 @Builder
 public class LoginRequest {
     @NotBlank
-    private String login;     // username OR email
+    private String login;     // username / email
 
     @NotBlank
     private String password;

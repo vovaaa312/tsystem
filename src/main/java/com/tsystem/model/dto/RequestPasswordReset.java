@@ -9,5 +9,5 @@ import lombok.*;
 @Builder
 public class RequestPasswordReset {
     @NotBlank
-    private String login;   // username или email
+    private String login;   // username / email
 }

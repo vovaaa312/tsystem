@@ -3,6 +3,7 @@ package com.tsystem.controller;
 
 import com.tsystem.model.Ticket;
 import com.tsystem.model.dto.request.TicketCreateRequest;
+import com.tsystem.model.dto.request.TicketPatchRequest;
 import com.tsystem.model.dto.request.TicketUpdateRequest;
 import com.tsystem.model.dto.response.TicketResponse;
 import com.tsystem.model.mapper.TicketMapper;
@@ -58,6 +59,13 @@ public class TicketController {
                                  @AuthenticationPrincipal UserDetails principal) {
         return TicketMapper.toResponse(tickets.update(projectId, ticketId, req, principal.getUsername()));
     }
+    @PatchMapping("/{ticketId}")
+    public TicketResponse patch(@PathVariable UUID projectId, @PathVariable UUID ticketId,
+                                @Valid @RequestBody TicketPatchRequest req,
+                                @AuthenticationPrincipal UserDetails principal) {
+        return TicketMapper.toResponse(tickets.patch(projectId, ticketId, req, principal.getUsername()));
+    }
+
 
     // DELETE /projects/{projectId}/tickets/{ticketId}
     @DeleteMapping("/{ticketId}")

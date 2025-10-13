@@ -2,6 +2,7 @@ package com.tsystem.service;
 
 import com.tsystem.exception.NotFoundException;
 import com.tsystem.model.Project;
+import com.tsystem.model.dto.request.ProjectPatchRequest;
 import com.tsystem.model.user.User;
 
 import com.tsystem.model.dto.request.ProjectCreateRequest;
@@ -63,6 +64,15 @@ public class ProjectService {
         p.setStatus(req.getStatus());
         return projects.save(p);
     }
+    @Transactional
+    public Project patch(UUID projectId, ProjectPatchRequest req, String username) {
+        Project p = mustOwnProject(projectId, username);
+        if (req.getName() != null)        p.setName(req.getName());
+        if (req.getDescription() != null) p.setDescription(req.getDescription());
+        if (req.getStatus() != null)      p.setStatus(req.getStatus());
+        return projects.save(p);
+    }
+
 
     @Transactional
     public void delete(UUID projectId, String username) {

@@ -39,9 +39,8 @@ public class Project {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "owner_id", nullable = false)
-    private User user; // владелец
+    private User user;
 
-    // связь в обратную сторону, чтобы при удалении проекта удалялись тикеты
     @OneToMany(mappedBy = "project", cascade = CascadeType.REMOVE, orphanRemoval = true)
     @Builder.Default
     private Set<Ticket> tickets = new LinkedHashSet<>();
@@ -50,8 +49,8 @@ public class Project {
     @Builder.Default
     private OffsetDateTime createdAt = OffsetDateTime.now();
 
-    @PrePersist
-    void prePersist() {
-        if (createdAt == null) createdAt = OffsetDateTime.now();
-    }
+//    @PrePersist
+//    void prePersist() {
+//        if (createdAt == null) createdAt = OffsetDateTime.now();
+//    }
 }

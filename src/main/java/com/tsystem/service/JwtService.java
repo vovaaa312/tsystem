@@ -27,12 +27,24 @@ public class JwtService {
     private static String SECRET_KEY;
 
     @Value("${jwt.secret-key}")
-    public void setSecretKey(String secretKey) {
+    private void setSecretKey(String secretKey) {
         SECRET_KEY = secretKey;
     }
 
+    private static int JWT_EXPIRATION_TIME;
+
+    @Value("${jwt.expiration-ms}")
+    private void setJwtExpirationTime(int jwtExpirationTime) {
+        JWT_EXPIRATION_TIME = jwtExpirationTime;
+    }
+
+
     public String extractUsername(String jwt) {
         return extractClaim(jwt, Claims::getSubject);
+    }
+
+    public Date extractIssuedAt(String jwt) {
+        return extractClaim(jwt, Claims::getIssuedAt);
     }
 
     public <T> T extractClaim(String jwt, Function<Claims, T> claimsResolver) {
@@ -53,25 +65,63 @@ public class JwtService {
             throw new IllegalArgumentException("User ID cannot be null");
         }
         claims.put("userId", user.getId());
-        System.out.println("Generating token with claims: " + claims); // Логирование
+        System.out.println("Generating token with claims: " + claims);
         return generateToken(claims, userDetails);
     }
 
-    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+    private String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+        //  int i = 7 * 24 * 60 * 60 * 1000;
         return Jwts.builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 7 * 24 * 60 * 60 * 1000))
+                .setExpiration(new Date(System.currentTimeMillis() + JWT_EXPIRATION_TIME))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public boolean isTokenValid(String jwt, UserDetails userDetails) {
-        final String username = extractUsername(jwt);
-        return (username.equals(userDetails.getUsername())) && !isTokenExpired(jwt);
-    }
+//    public boolean isTokenValid(String jwt, UserDetails userDetails) {
+//
+//        try {
+//            String username = extractUsername(jwt);
+//            if (username == null || !username.equals(userDetails.getUsername())) return false;
+//            if (isTokenExpired(jwt)) return false;
+//
+//            //
+////            Date iat = extractIssuedAt(jwt);
+////            if (iat != null && userDetails instanceof User) {
+////                User u = (User) userDetails;
+////                if (u.getPasswordChangedAt() != null
+////                        && iat.toInstant().isBefore(u.getPasswordChangedAt().toInstant())) {
+////                    return false;
+////                }
+////            }
+//
+//            return true;
+//        } catch (Exception e) {
+//            return false;
+//        }
+////
+////        final String username = extractUsername(jwt);
+////        return (username.equals(userDetails.getUsername())) && !isTokenExpired(jwt);
+//    }
 
+public boolean isTokenValid(String jwt, User user) {
+    try {
+        final String username = extractUsername(jwt);
+        if (username == null || !username.equals(user.getUsername())) return false;
+        if (isTokenExpired(jwt)) return false;
+
+        Date iat = extractIssuedAt(jwt);
+        if (iat != null && user.getPasswordChangedAt() != null
+                && iat.toInstant().isBefore(user.getPasswordChangedAt().toInstant())) {
+            return false;
+        }
+        return true;
+    } catch (Exception e) {
+        return false;
+    }
+}
     private boolean isTokenExpired(String jwt) {
 
         return extractExpiration(jwt).before(new Date());
@@ -95,22 +145,6 @@ public class JwtService {
     private Key getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
-    }
-
-
-    public String getTokenDetails(String jwt) {
-        Claims claims = extractAllClaims(jwt);
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("Token details:\n");
-        sb.append("Subject (username): ").append(claims.getSubject()).append("\n");
-        sb.append("UserID: ").append(claims.get("userId")).append("\n");
-        sb.append("Issued at: ").append(claims.getIssuedAt()).append("\n");
-        sb.append("Expiration: ").append(claims.getExpiration()).append("\n");
-        sb.append("All claims: ").append(claims).append("\n");
-        return sb.toString();
-
-
     }
 
 

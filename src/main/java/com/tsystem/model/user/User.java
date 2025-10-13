@@ -55,20 +55,21 @@ public class User implements UserDetails {
     private UUID resetTokenId;
 
     @Column(name = "password_changed_at")
-    private OffsetDateTime passwordChangedAt; // когда пароль менялся в последний раз
+    private OffsetDateTime passwordChangedAt;
 
 
     @Column(name = "created_at", nullable = false)
     @Builder.Default
     private OffsetDateTime createdAt = OffsetDateTime.now();
 
-    @PrePersist
-    void prePersist() {
-        if (createdAt == null) createdAt = OffsetDateTime.now();
-    }
+//    @PrePersist
+//    void prePersist() {
+//        if (createdAt == null) createdAt = OffsetDateTime.now();
+//    }
 
     @Enumerated(EnumType.STRING)
     private SystemRole role;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return role.getAuthorities();

@@ -3,6 +3,7 @@ package com.tsystem.service;
 import com.tsystem.exception.NotFoundException;
 import com.tsystem.model.Project;
 import com.tsystem.model.Ticket;
+import com.tsystem.model.dto.request.TicketPatchRequest;
 import com.tsystem.model.user.User;
 
 import com.tsystem.model.dto.request.TicketCreateRequest;
@@ -74,6 +75,17 @@ public class TicketService {
         t.setState(req.getState());
         return tickets.save(t);
     }
+    @Transactional
+    public Ticket patch(UUID projectId, UUID ticketId, TicketPatchRequest req, String username) {
+        Ticket t = get(projectId, ticketId, username);
+        if (req.getName() != null)        t.setName(req.getName());
+        if (req.getDescription() != null) t.setDescription(req.getDescription());
+        if (req.getType() != null)        t.setType(req.getType());
+        if (req.getPriority() != null)    t.setPriority(req.getPriority());
+        if (req.getState() != null)       t.setState(req.getState());
+        return tickets.save(t);
+    }
+
 
     @Transactional
     public void delete(UUID projectId, UUID ticketId, String username) {

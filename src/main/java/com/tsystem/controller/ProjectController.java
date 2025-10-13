@@ -3,6 +3,7 @@ package com.tsystem.controller;
 import com.tsystem.model.Project;
 
 import com.tsystem.model.dto.request.ProjectCreateRequest;
+import com.tsystem.model.dto.request.ProjectPatchRequest;
 import com.tsystem.model.dto.request.ProjectUpdateRequest;
 import com.tsystem.model.dto.response.ProjectResponse;
 import com.tsystem.model.mapper.ProjectMapper;
@@ -56,6 +57,14 @@ public class ProjectController {
                                   @AuthenticationPrincipal UserDetails principal) {
         return ProjectMapper.toResponse(projects.update(projectId, req, principal.getUsername()));
     }
+    // PATCH /projects/{projectId}
+    @PatchMapping("/{projectId}")
+    public ProjectResponse patch(@PathVariable UUID projectId,
+                                 @Valid @RequestBody ProjectPatchRequest req,
+                                 @AuthenticationPrincipal UserDetails principal) {
+        return ProjectMapper.toResponse(projects.patch(projectId, req, principal.getUsername()));
+    }
+
 
     // DELETE /projects/{projectId}
     @DeleteMapping("/{projectId}")
