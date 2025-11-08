@@ -10,12 +10,7 @@ import java.util.Collection;
 import java.util.UUID;
 
 @Entity
-@Table(name = "users", schema = "app",
-        indexes = {
-                @Index(name = "ux_users_username", columnList = "username", unique = true),
-                @Index(name = "ux_users_email",    columnList = "email",    unique = true),
-                @Index(name = "idx_users_reset_token", columnList = "reset_token_id")
-        })
+@Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor

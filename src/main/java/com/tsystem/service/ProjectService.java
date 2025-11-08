@@ -25,16 +25,6 @@ public class ProjectService {
     private final ProjectRepository projects;
     private final UserRepository users;
 
-    private User me(String username) {
-        return users.findByUsername(username).orElseThrow(NotFoundException::new);
-    }
-
-    private Project mustOwnProject(UUID projectId, String username) {
-        Project p = projects.findById(projectId).orElseThrow(NotFoundException::new);
-        if (!p.getUser().getUsername().equals(username)) throw new ForbiddenException();
-        return p;
-    }
-
     @Transactional
     public Project create(ProjectCreateRequest req, String username) {
         User owner = me(username);
@@ -78,5 +68,15 @@ public class ProjectService {
     public void delete(UUID projectId, String username) {
         Project p = mustOwnProject(projectId, username);
         projects.delete(p);
+    }
+
+    private User me(String username) {
+        return users.findByUsername(username).orElseThrow(NotFoundException::new);
+    }
+
+    private Project mustOwnProject(UUID projectId, String username) {
+        Project p = projects.findById(projectId).orElseThrow(NotFoundException::new);
+        if (!p.getUser().getUsername().equals(username)) throw new ForbiddenException();
+        return p;
     }
 }

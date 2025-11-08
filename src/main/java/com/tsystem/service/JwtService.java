@@ -80,31 +80,7 @@ public class JwtService {
                 .compact();
     }
 
-//    public boolean isTokenValid(String jwt, UserDetails userDetails) {
-//
-//        try {
-//            String username = extractUsername(jwt);
-//            if (username == null || !username.equals(userDetails.getUsername())) return false;
-//            if (isTokenExpired(jwt)) return false;
-//
-//            //
-////            Date iat = extractIssuedAt(jwt);
-////            if (iat != null && userDetails instanceof User) {
-////                User u = (User) userDetails;
-////                if (u.getPasswordChangedAt() != null
-////                        && iat.toInstant().isBefore(u.getPasswordChangedAt().toInstant())) {
-////                    return false;
-////                }
-////            }
-//
-//            return true;
-//        } catch (Exception e) {
-//            return false;
-//        }
-////
-////        final String username = extractUsername(jwt);
-////        return (username.equals(userDetails.getUsername())) && !isTokenExpired(jwt);
-//    }
+
 
 public boolean isTokenValid(String jwt, User user) {
     try {

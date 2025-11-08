@@ -23,6 +23,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RequestMapping("/api/projects/{projectId}/tickets")
 @SecurityRequirement(name = "bearerAuth")
+@CrossOrigin(methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
 
 public class TicketController {
 
