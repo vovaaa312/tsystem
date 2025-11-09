@@ -11,7 +11,7 @@ public class ApiError {
     private String error;         // Not Found
     private String message;       // human-readable
     private String path;          // /api/...
-    private List<FieldViolation> errors; // для валидации
+    private List<FieldViolation> errors; // for validation
 
     @Data @AllArgsConstructor @NoArgsConstructor
     public static class FieldViolation {

@@ -32,27 +32,6 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
-//    /** Registration */
-//    public TokenResponse register(RegisterRequest request) {
-//        if (userRepository.existsByUsernameOrEmail(request.getUsername(), request.getEmail())) {
-//            throw new IllegalArgumentException("User with same username or email already exists");
-//        }
-//
-//        User user = User.builder()
-//                .username(request.getUsername())
-//                .email(request.getEmail())
-//                .name(request.getName())         // важно, если NOT NULL
-//                .surname(request.getSurname())   // важно, если NOT NULL
-//                .password(passwordEncoder.encode(request.getPassword()))
-//                // .role(SystemRole.SYSTEM_USER)
-//                .build();
-//
-//        userRepository.save(user);
-//        String jwtToken = jwtService.generateToken((UserDetails) user);
-//
-//        return new TokenResponse(jwtToken);
-//    }
-
     public TokenResponse register(RegisterRequest request) {
         if (userRepository.existsByUsernameOrEmail(request.getUsername(), request.getEmail())) {
             throw new IllegalArgumentException("User with same username or email already exists");
