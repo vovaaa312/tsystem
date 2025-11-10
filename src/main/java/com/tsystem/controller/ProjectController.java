@@ -1,7 +1,5 @@
 package com.tsystem.controller;
 
-import com.tsystem.model.Project;
-
 import com.tsystem.model.dto.request.ProjectCreateRequest;
 import com.tsystem.model.dto.request.ProjectPatchRequest;
 import com.tsystem.model.dto.request.ProjectUpdateRequest;
@@ -27,12 +25,12 @@ import java.util.UUID;
 
 public class ProjectController {
 
-    private final ProjectService projects;
+    private final ProjectService projectService;
 
     // GET /projects
     @GetMapping
     public List<ProjectResponse> list(@AuthenticationPrincipal UserDetails principal) {
-        return projects.listMine(principal.getUsername())
+        return projectService.findByUserIdOrderByCreatedAtDesc(principal.getUsername())
                 .stream().map(ProjectMapper::toResponse).toList();
     }
 
@@ -41,14 +39,14 @@ public class ProjectController {
     @ResponseStatus(HttpStatus.CREATED)
     public ProjectResponse create(@Valid @RequestBody ProjectCreateRequest req,
                                   @AuthenticationPrincipal UserDetails principal) {
-        return ProjectMapper.toResponse(projects.create(req, principal.getUsername()));
+        return ProjectMapper.toResponse(projectService.create(req, principal.getUsername()));
     }
 
     // GET /projects/{projectId}
     @GetMapping("/{projectId}")
     public ProjectResponse get(@PathVariable UUID projectId,
                                @AuthenticationPrincipal UserDetails principal) {
-        return ProjectMapper.toResponse(projects.getMine(projectId, principal.getUsername()));
+        return ProjectMapper.toResponse(projectService.findById(projectId, principal.getUsername()));
     }
 
     // PUT /projects/{projectId}
@@ -56,14 +54,14 @@ public class ProjectController {
     public ProjectResponse update(@PathVariable UUID projectId,
                                   @Valid @RequestBody ProjectUpdateRequest req,
                                   @AuthenticationPrincipal UserDetails principal) {
-        return ProjectMapper.toResponse(projects.update(projectId, req, principal.getUsername()));
+        return ProjectMapper.toResponse(projectService.update(projectId, req, principal.getUsername()));
     }
     // PATCH /projects/{projectId}
     @PatchMapping("/{projectId}")
     public ProjectResponse patch(@PathVariable UUID projectId,
                                  @Valid @RequestBody ProjectPatchRequest req,
                                  @AuthenticationPrincipal UserDetails principal) {
-        return ProjectMapper.toResponse(projects.patch(projectId, req, principal.getUsername()));
+        return ProjectMapper.toResponse(projectService.patch(projectId, req, principal.getUsername()));
     }
 
 
@@ -72,6 +70,6 @@ public class ProjectController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable UUID projectId,
                        @AuthenticationPrincipal UserDetails principal) {
-        projects.delete(projectId, principal.getUsername());
+        projectService.delete(projectId, principal.getUsername());
     }
 }

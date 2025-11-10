@@ -2,7 +2,6 @@ package com.tsystem.model;
 
 
 import com.tsystem.model.enums.*;
-import com.tsystem.model.user.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -15,9 +14,13 @@ import java.util.UUID;
 @Table(name = "tickets",
         indexes = {
                 @Index(name = "idx_tickets_project", columnList = "project_id"),
-                @Index(name = "idx_tickets_author",  columnList = "author_id")
+                @Index(name = "idx_tickets_author", columnList = "author_id")
         })
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Ticket {
 
@@ -48,17 +51,22 @@ public class Ticket {
     @Builder.Default
     private TicketState state = TicketState.open; // open | in_progress | done
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "author_id", nullable = false)
-    private User user;
+    //    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    //    @JoinColumn(name = "author_id", nullable = false)
+    @Column(name = "author_id", nullable = false)
+    private UUID userId;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "project_id", nullable = false)
-    private Project project;
+    //    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    //    @JoinColumn(name = "project_id", nullable = false)
+    @Column(name = "project_id", nullable = false)
+    private UUID projectId;
 
     @Column(name = "created_at", nullable = false)
     @Builder.Default
     private OffsetDateTime createdAt = OffsetDateTime.now();
+
+    @Column(nullable = true)
+    private UUID assignedUserId;
 
 //    @PrePersist
 //    void prePersist() {

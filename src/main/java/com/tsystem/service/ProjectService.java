@@ -37,12 +37,12 @@ public class ProjectService {
     }
 
     @Transactional(readOnly = true)
-    public List<Project> listMine(String username) {
+    public List<Project> findByUserIdOrderByCreatedAtDesc(String username) {
         return projects.findByUserIdOrderByCreatedAtDesc(me(username).getId());
     }
 
     @Transactional(readOnly = true)
-    public Project getMine(UUID projectId, String username) {
+    public Project findById(UUID projectId, String username) {
         return mustOwnProject(projectId, username);
     }
 

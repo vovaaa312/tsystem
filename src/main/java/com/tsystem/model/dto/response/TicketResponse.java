@@ -19,4 +19,7 @@ public class TicketResponse {
     private TicketPriority priority;
     private TicketState state;
     private OffsetDateTime createdAt;
+    private UUID projectId;
+    private UUID userId;
+    private UUID assignedUserId;
 }

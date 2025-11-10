@@ -41,9 +41,9 @@ public class Project {
     @JoinColumn(name = "owner_id", nullable = false)
     private User user;
 
-    @OneToMany(mappedBy = "project", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    @Builder.Default
-    private Set<Ticket> tickets = new LinkedHashSet<>();
+//    @OneToMany(mappedBy = "project", cascade = CascadeType.REMOVE, orphanRemoval = true)
+//    @Builder.Default
+//    private Set<Ticket> tickets = new LinkedHashSet<>();
 
     @Column(name = "created_at", nullable = false)
     @Builder.Default

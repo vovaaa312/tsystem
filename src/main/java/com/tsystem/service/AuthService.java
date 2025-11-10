@@ -1,6 +1,7 @@
 package com.tsystem.service;
 
 
+import com.tsystem.exception.ForbiddenException;
 import com.tsystem.model.dto.request.LoginRequest;
 import com.tsystem.model.dto.request.RegisterRequest;
 import com.tsystem.model.dto.response.TokenResponse;
@@ -61,7 +62,7 @@ public class AuthService {
     public TokenResponse authenticate(LoginRequest request) {
         var user = userRepository.findByUsername(request.getLogin())
                 .orElseGet(() -> userRepository.findByEmail(request.getLogin())
-                        .orElseThrow(() -> new IllegalArgumentException("Invalid credentials")));
+                        .orElseThrow(() -> new ForbiddenException("Invalid credentials")));
 
 
         authenticationManager.authenticate(
