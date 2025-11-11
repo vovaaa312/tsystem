@@ -8,6 +8,8 @@ import com.tsystem.model.dto.response.TokenResponse;
 import com.tsystem.service.AuthService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,19 +24,27 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     @PostMapping("/register")
     public ResponseEntity<?> register(
             @RequestBody RegisterRequest request
     ) {
-        return ResponseEntity.ok(authService.register(request));
+        ResponseEntity entity = ResponseEntity.ok(authService.register(request));
+
+        logger.info("user registered: "+entity.toString());
+        return entity;
+
     }
 
     @PostMapping("/login")
-    public ResponseEntity<TokenResponse> authenticate(
+    public ResponseEntity<?> authenticate(
             @RequestBody LoginRequest loginRequest
     ) {
-        return ResponseEntity.ok(authService.authenticate(loginRequest));
+
+        ResponseEntity<TokenResponse> entity = ResponseEntity.ok(authService.authenticate(loginRequest));
+        logger.info("login detected: "+entity.toString());
+        return entity;
     }
 
     @PostMapping("/request-password-reset")

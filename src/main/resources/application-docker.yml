@@ -1,22 +1,22 @@
-spring:
-  datasource:
-    url: jdbc:postgresql://postgres:5432/tsystem
-    username: app
-    password: app
-    driver-class-name: org.postgresql.Driver
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
-    open-in-view: false
-    show-sql: true
-
-# Если используешь Java API client для ES — этого блока не требуется.
-# Если Spring Data Elasticsearch — можно указать:
-#  elasticsearch:
-#    uris: http://elasticsearch:9200
-
-server:
-  port: 8080
+#spring:
+#  datasource:
+#    url: jdbc:postgresql://postgres:5432/tsystem
+#    username: app
+#    password: app
+#    driver-class-name: org.postgresql.Driver
+#
+#  jpa:
+#    hibernate:
+#      ddl-auto: update
+#    properties:
+#      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+#    open-in-view: false
+#    show-sql: true
+#
+## Если используешь Java API client для ES — этого блока не требуется.
+## Если Spring Data Elasticsearch — можно указать:
+##  elasticsearch:
+##    uris: http://elasticsearch:9200
+#
+#server:
+#  port: 8080

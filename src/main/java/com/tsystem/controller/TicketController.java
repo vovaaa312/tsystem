@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/projects/{projectId}/tickets")
+@RequestMapping("/api/projects/{projectId}/tickets")
 @RequiredArgsConstructor
 public class TicketController {
 

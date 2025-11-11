@@ -1,4 +1,4 @@
-#version: "3.8"
+version: "3.8"
 #
 #services:
 #  postgres:
@@ -68,4 +68,6 @@ services:
     ports:
       - "5044:5044"
     restart: unless-stopped
+    labels:
+      org.springframework.boot.readiness-check.tcp.disable: "true"
 

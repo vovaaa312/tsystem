@@ -1,3 +1,0 @@
-CREATE SCHEMA IF NOT EXISTS app AUTHORIZATION app;
-
-ALTER ROLE app SET search_path TO app,public;
