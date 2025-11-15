@@ -1,0 +1,22 @@
+// src/services/api.ts
+import axios from 'axios';
+
+const API_URL = 'http://localhost:8080/api'; // подставь свой бэкенд
+
+const api = axios.create({
+    baseURL: API_URL,
+    headers: {
+        'Content-Type': 'application/json',
+    },
+});
+
+// add token to headers
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
+
+export default api;

@@ -1,25 +1,32 @@
 version: "3.8"
-#
-#services:
-#  postgres:
-#    image: postgres:16-alpine
-#    container_name: ts-postgres
-#    environment:
-#      POSTGRES_DB: tsystem
-#      POSTGRES_USER: app
-#      POSTGRES_PASSWORD: app
-#    ports:
-#      - "5432:5432"
-#    restart: unless-stopped
 
 services:
+  frontend:
+    build:
+      context: ./frontend/tsystem-frontend
+      dockerfile: Dockerfile
+    container_name: ts-frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend/tsystem-frontend:/app
+      - /app/node_modules
+#    environment:
+#      - VITE_API_URL=http://localhost:8080/api  # или твой бэк
+    depends_on:
+      - postgres
+      - logstash
+    restart: unless-stopped
+
   postgres:
     image: postgres:16-alpine
     container_name: ts-postgres
+    env_file:
+      - .env
     environment:
-      POSTGRES_DB: tsystem
-      POSTGRES_USER: app
-      POSTGRES_PASSWORD: app
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     restart: unless-stopped
@@ -59,9 +66,9 @@ services:
       - postgres
       - elasticsearch
     volumes:
-      # твой pipeline для тикетов
+      # tickets pipeline
       - ./logstash/logstash-tickets.conf:/usr/share/logstash/pipeline/logstash.conf:ro
-      # JDBC-драйвер PostgreSQL (скачивать .jar и положить в ./drivers)
+      # JDBC driver PostgreSQL (.jar in ./drivers)
       - ./drivers/postgresql.jar:/usr/share/logstash/lib/postgresql.jar:ro
     environment:
       - LS_JAVA_OPTS=-Xms512m -Xmx512m
