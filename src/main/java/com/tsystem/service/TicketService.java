@@ -42,6 +42,12 @@ public class TicketService {
     }
 
     @Transactional(readOnly = true)
+    public List<Ticket> listByAssigned(String username) {
+
+        return tickets.findAllByAssignedUserId(me(username).getId()).orElse(null);
+    }
+
+    @Transactional(readOnly = true)
     public Ticket findByIdAndProjectId(UUID projectId, UUID ticketId, String username) {
         mustOwnProject(projectId, username);
         return tickets.findByIdAndProjectId(ticketId, projectId)

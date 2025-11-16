@@ -9,6 +9,7 @@ import com.tsystem.model.enums.TicketType;
 import com.tsystem.model.user.SystemRole;
 import com.tsystem.model.user.User;
 import com.tsystem.repository.*;
+import com.tsystem.service.GeneratorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,8 +29,12 @@ public class DataInitializer implements CommandLineRunner {
     private final TicketCommentRepository comments;
     private final PasswordEncoder encoder;
 
+    private final GeneratorService generatorService;
+
     @Override
     public void run(String... args) {
+
+//        generatorService.generateData(4, 1, 2);
 //
 //        // ---------- USERS ----------
 //        User admin = createIfMissing(

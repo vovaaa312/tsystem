@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -21,16 +22,25 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/projects/{projectId}/tickets")
+//@RequestMapping("/api/projects/{projectId}/tickets")
+@RequestMapping("/api")
+
 @RequiredArgsConstructor
+@CrossOrigin(methods = {RequestMethod.PATCH,RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
+
 public class TicketController {
 
     private final TicketService ticketService;
 
     // --------- TICKETS ---------
 
+    @GetMapping("/tickets")
+    public ResponseEntity<?> listAssigned( @AuthenticationPrincipal UserDetails principal) {
+        return ResponseEntity.ok(ticketService.listByAssigned(principal.getUsername()));
+    }
+
     // GET /projects/{projectId}/tickets
-    @GetMapping
+    @GetMapping("/projects/{projectId}/tickets")
     @SecurityRequirement(name = "bearerAuth")
     public List<TicketResponse> list(@PathVariable UUID projectId,
                                      @AuthenticationPrincipal UserDetails principal) {
@@ -41,7 +51,7 @@ public class TicketController {
     }
 
     // POST /projects/{projectId}/tickets
-    @PostMapping
+    @PostMapping("/projects/{projectId}/tickets")
     @ResponseStatus(HttpStatus.CREATED)
     @SecurityRequirement(name = "bearerAuth")
     public TicketResponse create(@PathVariable UUID projectId,
@@ -53,7 +63,7 @@ public class TicketController {
     }
 
     // GET /projects/{projectId}/tickets/{ticketId}
-    @GetMapping("/{ticketId}")
+    @GetMapping("/projects/{projectId}/tickets/{ticketId}")
     @SecurityRequirement(name = "bearerAuth")
     public TicketResponse get(@PathVariable UUID projectId,
                               @PathVariable UUID ticketId,
@@ -64,7 +74,7 @@ public class TicketController {
     }
 
     // PUT /projects/{projectId}/tickets/{ticketId}
-    @PutMapping("/{ticketId}")
+    @PutMapping("/projects/{projectId}/tickets/{ticketId}")
     @SecurityRequirement(name = "bearerAuth")
     public TicketResponse update(@PathVariable UUID projectId,
                                  @PathVariable UUID ticketId,
@@ -76,7 +86,7 @@ public class TicketController {
     }
 
     // PATCH /projects/{projectId}/tickets/{ticketId}
-    @PatchMapping("/{ticketId}")
+    @PatchMapping("/projects/{projectId}/tickets/{ticketId}")
     @SecurityRequirement(name = "bearerAuth")
     public TicketResponse patch(@PathVariable UUID projectId,
                                 @PathVariable UUID ticketId,
@@ -88,7 +98,7 @@ public class TicketController {
     }
 
     // DELETE /projects/{projectId}/tickets/{ticketId}
-    @DeleteMapping("/{ticketId}")
+    @DeleteMapping("/projects/{projectId}/tickets/{ticketId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @SecurityRequirement(name = "bearerAuth")
     public void delete(@PathVariable UUID projectId,
@@ -98,7 +108,7 @@ public class TicketController {
     }
 
     // PUT /projects/{projectId}/tickets/{ticketId}/assign/{assignedUserId}
-    @PutMapping("/{ticketId}/assign/{assignedUserId}")
+    @PutMapping("/projects/{projectId}/tickets/{ticketId}/assign/{assignedUserId}")
     @ResponseStatus(HttpStatus.OK)
     @SecurityRequirement(name = "bearerAuth")
     public TicketResponse assign(@PathVariable UUID projectId,
@@ -112,7 +122,7 @@ public class TicketController {
     // --------- COMMENTS ---------
 
     // GET /projects/{projectId}/tickets/{ticketId}/comments
-    @GetMapping("/{ticketId}/comments")
+    @GetMapping("/projects/{projectId}/tickets/{ticketId}/comments")
     @SecurityRequirement(name = "bearerAuth")
     public List<TicketCommentResponse> listComments(@PathVariable UUID projectId,
                                                     @PathVariable UUID ticketId,
@@ -123,7 +133,7 @@ public class TicketController {
     }
 
     // POST /projects/{projectId}/tickets/{ticketId}/comments
-    @PostMapping("/{ticketId}/comments")
+    @PostMapping("/projects/{projectId}/tickets/{ticketId}/comments")
     @ResponseStatus(HttpStatus.CREATED)
     @SecurityRequirement(name = "bearerAuth")
     public TicketCommentResponse addComment(@PathVariable UUID projectId,
@@ -136,7 +146,7 @@ public class TicketController {
     }
 
     // PUT /projects/{projectId}/tickets/{ticketId}/comments/{commentId}
-    @PutMapping("/{ticketId}/comments/{commentId}")
+    @PutMapping("/projects/{projectId}/tickets/{ticketId}/comments/{commentId}")
     @SecurityRequirement(name = "bearerAuth")
     public TicketCommentResponse updateComment(@PathVariable UUID projectId,
                                                @PathVariable UUID ticketId,
@@ -149,7 +159,7 @@ public class TicketController {
     }
 
     // DELETE /projects/{projectId}/tickets/{ticketId}/comments/{commentId}
-    @DeleteMapping("/{ticketId}/comments/{commentId}")
+    @DeleteMapping("/projects/{projectId}/tickets/{ticketId}/comments/{commentId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @SecurityRequirement(name = "bearerAuth")
     public void deleteComment(@PathVariable UUID projectId,
@@ -162,7 +172,7 @@ public class TicketController {
     // --------- HISTORY ---------
 
     // GET /projects/{projectId}/tickets/{ticketId}/history
-    @GetMapping("/{ticketId}/history")
+    @GetMapping("/projects/{projectId}/tickets/{ticketId}/history")
     @SecurityRequirement(name = "bearerAuth")
     public List<TicketHistoryResponse> history(@PathVariable UUID projectId,
                                                @PathVariable UUID ticketId,

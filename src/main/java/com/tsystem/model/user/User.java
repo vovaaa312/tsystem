@@ -93,4 +93,23 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                ", name='" + name + '\'' +
+                ", surname='" + surname + '\'' +
+                ", password='" + password + '\'' +
+                ", resetCode='" + resetCode + '\'' +
+                ", resetCodeExp=" + resetCodeExp +
+                ", resetTokenId=" + resetTokenId +
+                ", passwordChangedAt=" + passwordChangedAt +
+                ", createdAt=" + createdAt +
+                ", role=" + role +
+                '}';
+    }
 }

@@ -1,3 +1,4 @@
+// src/contexts/AuthContext.tsx
 import {
     createContext,
     useContext,
@@ -30,7 +31,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }, [token]);
 
     const value: AuthContextType = {
-        token,
+        token,                      // <-- здесь было `code`, исправлено
         isAuthenticated: !!token,
         login: (t: string) => setToken(t),
         logout: () => setToken(null),

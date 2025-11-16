@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import type { LoginRequest, TokenResponse } from "../model/auth";
 import { authService } from "../services/authService";
 import { useAuth } from "../contexts/AuthContext";
@@ -9,6 +9,8 @@ export default function LoginForm() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const { login: saveToken } = useAuth();
+    const navigate = useNavigate();
+
 
     const onSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -22,6 +24,7 @@ export default function LoginForm() {
 
             if (response?.token) {
                 saveToken(response.token);
+                navigate("/");
             }
         } catch (err: any) {
             setError(err.message || "Login failed");
@@ -31,7 +34,9 @@ export default function LoginForm() {
     };
 
     return (
+
         <div className="d-flex justify-content-center align-items-center min-vh-100 bg-light">
+
             <div className="card shadow-sm" style={{ minWidth: 360, maxWidth: 420, width: "100%" }}>
                 <div className="card-body">
                     <h3 className="card-title mb-3 text-center">Login</h3>
@@ -85,6 +90,13 @@ export default function LoginForm() {
                             Register
                         </Link>
                     </p>
+
+                    <div className="mt-3 text-center">
+                        <a href="/reset-password-request">Forgot password?</a>
+                        <br />
+                        <a href="/reset-password">Reset password (I have token)</a>
+                    </div>
+
                 </div>
             </div>
         </div>

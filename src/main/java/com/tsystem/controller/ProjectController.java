@@ -21,7 +21,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RequestMapping("/api/projects")
 @SecurityRequirement(name = "bearerAuth")
-@CrossOrigin(methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
+@CrossOrigin(methods = {RequestMethod.PATCH,RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
 
 public class ProjectController {
 
