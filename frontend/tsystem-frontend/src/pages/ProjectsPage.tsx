@@ -1,6 +1,6 @@
 // src/pages/ProjectsPage.tsx
-import {useEffect, useState} from "react";
-import {useNavigate} from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
     Container,
     Table,
@@ -15,6 +15,7 @@ import {
     projectService,
     type ProjectResponse,
 } from "../services/projectService";
+import { useAuth } from "../contexts/AuthContext";
 
 type ProjectFormState = {
     id?: string;
@@ -41,6 +42,21 @@ const ProjectsPage = () => {
     const [saving, setSaving] = useState(false);
 
     const navigate = useNavigate();
+    const { logout } = useAuth();
+
+    const handleAuthError = (e: any, fallback: string) => {
+        if (
+            e?.status === 401 ||
+            e?.status === 403 ||
+            e?.message === "Unauthorized" ||
+            e?.message === "No authentication token found"
+        ) {
+            logout();
+            navigate("/login");
+            return;
+        }
+        setError(e?.message ?? fallback);
+    };
 
     const loadProjects = async () => {
         try {
@@ -49,7 +65,7 @@ const ProjectsPage = () => {
             setProjects(data);
             setError(null);
         } catch (e: any) {
-            setError(e.message ?? "Failed to load projects");
+            handleAuthError(e, "Failed to load projects");
         } finally {
             setLoading(false);
         }
@@ -57,14 +73,13 @@ const ProjectsPage = () => {
 
     useEffect(() => {
         loadProjects();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const filtered = projects.filter((p) => {
         const matchesText =
             p.name.toLowerCase().includes(search.toLowerCase()) ||
-            (p.description ?? "")
-                .toLowerCase()
-                .includes(search.toLowerCase());
+            (p.description ?? "").toLowerCase().includes(search.toLowerCase());
         const matchesStatus =
             statusFilter === "all" || p.status === statusFilter;
         return matchesText && matchesStatus;
@@ -86,10 +101,12 @@ const ProjectsPage = () => {
     };
 
     const handleFormChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+        e: React.ChangeEvent<
+            HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+        >
     ) => {
-        const {name, value} = e.target;
-        setForm((prev) => ({...prev, [name]: value}));
+        const { name, value } = e.target;
+        setForm((prev) => ({ ...prev, [name]: value }));
     };
 
     const handleSave = async (e: React.FormEvent) => {
@@ -111,7 +128,7 @@ const ProjectsPage = () => {
             setShowModal(false);
             await loadProjects();
         } catch (e: any) {
-            setError(e.message ?? "Failed to save project");
+            handleAuthError(e, "Failed to save project");
         } finally {
             setSaving(false);
         }
@@ -123,7 +140,7 @@ const ProjectsPage = () => {
             await projectService.remove(project.id);
             await loadProjects();
         } catch (e: any) {
-            setError(e.message ?? "Failed to delete project");
+            handleAuthError(e, "Failed to delete project");
         }
     };
 
@@ -173,7 +190,7 @@ const ProjectsPage = () => {
                         <th>Description</th>
                         <th>Status</th>
                         <th>Created at</th>
-                        <th/>
+                        <th />
                     </tr>
                     </thead>
                     <tbody>
@@ -194,7 +211,9 @@ const ProjectsPage = () => {
                             <td>{p.status}</td>
                             <td>
                                 {p.createdAt
-                                    ? new Date(p.createdAt).toLocaleString()
+                                    ? new Date(
+                                        p.createdAt
+                                    ).toLocaleString()
                                     : "-"}
                             </td>
                             <td className="text-nowrap">

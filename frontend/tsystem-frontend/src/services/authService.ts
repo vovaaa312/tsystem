@@ -6,6 +6,7 @@ import type {
     ResetPassword,
     ChangePassword,
 } from "../model/auth";
+import type {ProjectResponse} from "./projectService.ts";
 
 const API_BASE_URL =
     import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080";
@@ -96,4 +97,17 @@ export const authService = {
 
         await handleResponse(res);
     },
+
+    async getRole(token: string): Promise<string> {
+        const res = await fetch(`${AUTH_BASE}/get-role`, {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        const data = await handleResponse(res);
+        return data as string;
+    },
+
 };

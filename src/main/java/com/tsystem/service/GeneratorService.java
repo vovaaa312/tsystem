@@ -130,12 +130,10 @@ public class GeneratorService {
     // --------------------------------------------------------------------
     private void generateTicketsForProject(Project project, User owner, List<User> allUsers, int ticketsPerUser) {
 
-        // исполнители = все, кроме владельца проекта
         List<User> assignees = allUsers.stream()
                 .filter(u -> !u.getId().equals(owner.getId()))
                 .toList();
 
-        // защита — список исполнителей не пустой
         if (assignees.isEmpty()) {
             throw new IllegalStateException("At least 2 users required: project owner + assignee");
         }
@@ -143,7 +141,6 @@ public class GeneratorService {
         for (int i = 0; i < ticketsPerUser; i++) {
             for (User ignored : allUsers) {
 
-                // выбираем случайного исполнителя
                 User assigned = assignees.get(random.nextInt(assignees.size()));
 
                 Ticket ticket = createTicket(project, owner, assigned);

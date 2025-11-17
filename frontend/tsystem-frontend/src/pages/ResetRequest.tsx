@@ -10,6 +10,7 @@ export default function ResetRequest() {
         try {
             await authService.requestPasswordReset({ email });
             setMessage("Reset token was generated. Check server logs.");
+
         } catch (err: any) {
             setMessage(err.message);
         }

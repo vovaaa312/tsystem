@@ -2,6 +2,8 @@
 import { useState } from "react";
 import { Container, Card, Form, Button, Alert } from "react-bootstrap";
 import { authService } from "../services/authService";
+import {useAuth} from "../contexts/AuthContext.tsx";
+import {useNavigate} from "react-router-dom";
 
 const ChangePassword = () => {
     const [oldPassword, setOldPassword] = useState("");
@@ -10,6 +12,8 @@ const ChangePassword = () => {
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
+    const { token, isAuthenticated, logout } = useAuth();
+    const navigate = useNavigate();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -34,9 +38,11 @@ const ChangePassword = () => {
                 token
             );
             setSuccess("Password changed successfully");
+
             setOldPassword("");
             setNewPassword("");
             setConfirmNewPassword("");
+            handleLogout()
         } catch (err) {
             setError(
                 err instanceof Error ? err.message : "Failed to change password"
@@ -44,6 +50,11 @@ const ChangePassword = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleLogout = () => {
+        logout();
+        navigate("/login");
     };
 
     return (

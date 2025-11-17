@@ -2,40 +2,55 @@
 import {
     createContext,
     useContext,
-    useEffect,
     useState,
     ReactNode,
+    useMemo,
 } from "react";
 
 interface AuthContextType {
     token: string | null;
+    role: string | null;
     isAuthenticated: boolean;
-    login: (token: string) => void;
+    login: (token: string, role: string) => void;
     logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-    const [token, setToken] = useState<string | null>(() =>
-        typeof window !== "undefined" ? localStorage.getItem("token") : null
+    const [token, setToken] = useState<string | null>(
+        () => localStorage.getItem("token")
+    );
+    const [role, setRole] = useState<string | null>(
+        () => localStorage.getItem("role")
     );
 
-    useEffect(() => {
-        if (typeof window === "undefined") return;
-        if (token) {
-            localStorage.setItem("token", token);
-        } else {
-            localStorage.removeItem("token");
-        }
-    }, [token]);
+    const isAuthenticated = !!token;
 
-    const value: AuthContextType = {
-        token,                      // <-- здесь было `code`, исправлено
-        isAuthenticated: !!token,
-        login: (t: string) => setToken(t),
-        logout: () => setToken(null),
+    const login = (newToken: string, newRole: string) => {
+        setToken(newToken);
+        setRole(newRole);
+        localStorage.setItem("token", newToken);
+        localStorage.setItem("role", newRole);
     };
+
+    const logout = () => {
+        setToken(null);
+        setRole(null);
+        localStorage.removeItem("token");
+        localStorage.removeItem("role");
+    };
+
+    const value = useMemo(
+        () => ({
+            token,
+            role,
+            isAuthenticated,
+            login,
+            logout,
+        }),
+        [token, role, isAuthenticated]
+    );
 
     return (
         <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

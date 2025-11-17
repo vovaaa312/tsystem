@@ -21,7 +21,7 @@ import java.util.List;
 @EnableWebSecurity
 @EnableMethodSecurity
 @RequiredArgsConstructor
-public class SecurityConfiguration  {
+public class SecurityConfiguration {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
@@ -31,10 +31,12 @@ public class SecurityConfiguration  {
             "/api/auth/login",
             "/api/auth/request-password-reset",
             "/api/auth/reset-password",
+            "/api/admin/**",
             "/swagger-ui/**",
             "/swagger-ui.html",
             "/v3/api-docs/**",
     };
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 

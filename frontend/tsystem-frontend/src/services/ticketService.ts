@@ -92,10 +92,11 @@ export const ticketService = {
         );
     },
 
-    // (опционально) GET /api/tickets — все мои (если нужно где-то ещё)
     async findMyAll(): Promise<TicketResponse[]> {
         return authFetch(TICKETS_BASE, {method: "GET"});
     },
+
+
     async findMyAssigned(): Promise<TicketResponse[]> {
         return authFetch(TICKETS_BASE, { method: "GET" });
     },

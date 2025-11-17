@@ -11,6 +11,7 @@ import ResetRequest from "./pages/ResetRequest";
 import ResetPassword from "./pages/ResetPassword";
 import ChangePassword from "./pages/ChangePassword";
 import Header from "./components/Header";
+import GenerateDataPage from "./pages/GenerateDataPage";
 
 function App() {
     return (
@@ -24,15 +25,22 @@ function App() {
                         path="/reset-password-request"
                         element={<ResetRequest />}
                     />
-                    <Route path="/reset-password" element={<ResetPassword />} />
+                    <Route
+                        path="/reset-password"
+                        element={<ResetPassword />}
+                    />
 
                     <Route element={<ProtectedRoute />}>
-                        <Route path="/projects" element={<ProjectsPage />} />
                         <Route
-                            path="/projects/:projectId/tickets"
-                            element={<TicketsPage />}
+                            path="/"
+                            element={<Navigate to="/projects" replace />}
                         />
+                        <Route path="/projects" element={<ProjectsPage />} />
                         <Route path="/tickets" element={<TicketsPage />} />
+                        <Route
+                            path="/admin/generate-data"
+                            element={<GenerateDataPage />}
+                        />
                         <Route
                             path="/change-password"
                             element={<ChangePassword />}

@@ -1,6 +1,6 @@
 // src/pages/TicketsPage.tsx
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
     Container,
     Table,
@@ -18,6 +18,7 @@ import {
     getCurrentUserId,
     type TicketRequestDto,
 } from "../services/ticketService";
+import { useAuth } from "../contexts/AuthContext";
 
 type TicketFormState = {
     id?: string;
@@ -50,23 +51,38 @@ const TicketsPage = () => {
     const [form, setForm] = useState<TicketFormState>(EMPTY_TICKET);
     const [saving, setSaving] = useState(false);
 
+    const navigate = useNavigate();
+    const { logout } = useAuth();
+
+    const handleAuthError = (e: any, fallback: string) => {
+        if (
+            e?.status === 401 ||
+            e?.status === 403 ||
+            e?.message === "Unauthorized" ||
+            e?.message === "No authentication token found"
+        ) {
+            logout();
+            navigate("/login");
+            return;
+        }
+        setError(e?.message ?? fallback);
+    };
+
     const loadTickets = async () => {
         try {
             setLoading(true);
             let data: TicketResponse[];
 
             if (projectId) {
-                // тикеты конкретного проекта
                 data = await ticketService.findByProject(projectId);
             } else {
-                // глобальный список — все тикеты, где пользователь assigned
                 data = await ticketService.findMyAssigned();
             }
 
             setTickets(data);
             setError(null);
         } catch (e: any) {
-            setError(e.message ?? "Failed to load tickets");
+            handleAuthError(e, "Failed to load tickets");
         } finally {
             setLoading(false);
         }
@@ -77,8 +93,10 @@ const TicketsPage = () => {
             const id = getCurrentUserId();
             setCurrentUserId(id);
         } catch (e: any) {
-            setError(e.message ?? "Failed to read current user");
+            // если токен битый — выкидываем на логин
+            handleAuthError(e, "Failed to read current user");
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
@@ -88,9 +106,6 @@ const TicketsPage = () => {
 
     let visibleTickets = tickets;
 
-    // если зашли по проекту:
-    // - если пользователь владелец проекта, бэк уже отдаёт все тикеты
-    // - если нет (и бэк позволяет), фильтруем клиентом: только созданные им или назначенные ему
     if (projectId && currentUserId && onlyMineInProject) {
         visibleTickets = tickets.filter(
             (t) =>
@@ -98,9 +113,6 @@ const TicketsPage = () => {
                 t.assignedUserId === currentUserId
         );
     }
-
-    // если зашли просто на /tickets без projectId:
-    // - бэк уже отдаёт только assigned тикеты по /api/tickets
 
     const openCreateModal = () => {
         setForm(EMPTY_TICKET);
@@ -131,10 +143,7 @@ const TicketsPage = () => {
 
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!projectId) {
-            // создание/редактирование имеет смысл только в контексте проекта
-            return;
-        }
+        if (!projectId) return;
 
         try {
             setSaving(true);
@@ -157,7 +166,7 @@ const TicketsPage = () => {
             setShowModal(false);
             await loadTickets();
         } catch (e: any) {
-            setError(e.message ?? "Failed to save ticket");
+            handleAuthError(e, "Failed to save ticket");
         } finally {
             setSaving(false);
         }
@@ -171,7 +180,7 @@ const TicketsPage = () => {
             await ticketService.remove(projectId, t.id);
             await loadTickets();
         } catch (e: any) {
-            setError(e.message ?? "Failed to delete ticket");
+            handleAuthError(e, "Failed to delete ticket");
         }
     };
 
@@ -193,19 +202,14 @@ const TicketsPage = () => {
                             label="Only my tickets in this project"
                             checked={onlyMineInProject}
                             onChange={(e) =>
-                                setOnlyMineInProject(
-                                    e.currentTarget.checked
-                                )
+                                setOnlyMineInProject(e.currentTarget.checked)
                             }
                             className="d-inline-block me-3"
                         />
                     )}
 
                     {projectId && (
-                        <Button
-                            variant="primary"
-                            onClick={openCreateModal}
-                        >
+                        <Button variant="primary" onClick={openCreateModal}>
                             Add Ticket
                         </Button>
                     )}
@@ -237,17 +241,14 @@ const TicketsPage = () => {
                             <td>{t.description}</td>
                             <td>{t.type}</td>
                             <td>
-                                <Badge bg="secondary">
-                                    {t.priority}
-                                </Badge>
+                                <Badge bg="secondary">{t.priority}</Badge>
                             </td>
                             <td>
                                 <Badge
                                     bg={
                                         t.state === "open"
                                             ? "success"
-                                            : t.state ===
-                                            "in_progress"
+                                            : t.state === "in_progress"
                                                 ? "warning"
                                                 : "secondary"
                                     }
@@ -269,18 +270,14 @@ const TicketsPage = () => {
                                         size="sm"
                                         variant="outline-secondary"
                                         className="me-2"
-                                        onClick={() =>
-                                            openEditModal(t)
-                                        }
+                                        onClick={() => openEditModal(t)}
                                     >
                                         Edit
                                     </Button>
                                     <Button
                                         size="sm"
                                         variant="outline-danger"
-                                        onClick={() =>
-                                            handleDelete(t)
-                                        }
+                                        onClick={() => handleDelete(t)}
                                     >
                                         Delete
                                     </Button>
@@ -361,9 +358,7 @@ const TicketsPage = () => {
                                 onChange={handleFormChange}
                             >
                                 <option value="open">open</option>
-                                <option value="in_progress">
-                                    in_progress
-                                </option>
+                                <option value="in_progress">in_progress</option>
                                 <option value="closed">closed</option>
                             </Form.Select>
                         </Form.Group>

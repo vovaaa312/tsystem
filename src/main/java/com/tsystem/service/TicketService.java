@@ -75,7 +75,6 @@ public class TicketService {
 
         Ticket saved = tickets.save(ticket);
 
-        // первая запись истории (создание тикета)
         registerHistory(saved,
                 null, saved.getState(),
                 null, saved.getPriority(),

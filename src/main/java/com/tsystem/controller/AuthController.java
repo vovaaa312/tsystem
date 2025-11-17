@@ -5,6 +5,7 @@ import com.tsystem.model.dto.*;
 import com.tsystem.model.dto.request.LoginRequest;
 import com.tsystem.model.dto.request.RegisterRequest;
 import com.tsystem.model.dto.response.TokenResponse;
+import com.tsystem.model.user.User;
 import com.tsystem.service.AuthService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
@@ -67,5 +68,13 @@ public class AuthController {
         if (principal == null) throw new UnauthorizedException("Unauthorized");
         authService.changePassword(req, principal.getUsername());
     }
+
+     @GetMapping("/get-role")
+     @SecurityRequirement(name = "bearerAuth")
+//     @ResponseStatus(HttpStatus.NO_CONTENT)
+    public ResponseEntity<?> getRole(@AuthenticationPrincipal User principal) {
+        return ResponseEntity.ok(principal.getRole());
+     }
+
 
 }

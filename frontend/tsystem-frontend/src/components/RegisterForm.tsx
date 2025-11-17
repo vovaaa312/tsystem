@@ -1,5 +1,7 @@
+// src/components/RegisterForm.tsx
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Container, Card, Form, Button, Alert, Row, Col } from "react-bootstrap";
 import type { RegisterRequest } from "../model/auth";
 import { authService } from "../services/authService";
 
@@ -16,16 +18,17 @@ export default function RegisterForm() {
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
 
+    const updateField = (field: keyof RegisterRequest, value: string) => {
+        setForm((prev) => ({ ...prev, [field]: value }));
+    };
+
     const onSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
         setLoading(true);
 
         try {
-            const response = await authService.register(form);
-
-            alert("Register response:\n" + JSON.stringify(response, null, 2));
-
+            await authService.register(form);
             navigate("/login");
         } catch (err: any) {
             setError(err.message || "Registration failed");
@@ -34,86 +37,107 @@ export default function RegisterForm() {
         }
     };
 
-    const updateField = (field: keyof RegisterRequest, value: string) => {
-        setForm((prev) => ({ ...prev, [field]: value }));
-    };
-
     return (
-        <div style={{ maxWidth: 500, margin: "40px auto" }}>
-            <h2>Register</h2>
+        <Container
+            className="d-flex justify-content-center align-items-center"
+            style={{ minHeight: "100vh" }}
+        >
+            <Card style={{ width: "100%", maxWidth: 500 }}>
+                <Card.Body>
+                    <h2 className="text-center mb-4">Register</h2>
 
-            {error && (
-                <div style={{ color: "red", marginBottom: 8 }}>
-                    {error}
-                </div>
-            )}
+                    {error && <Alert variant="danger">{error}</Alert>}
 
-            <form onSubmit={onSubmit}>
-                <div style={{ marginBottom: 8 }}>
-                    <label style={{ display: "block", marginBottom: 4 }}>Username</label>
-                    <input
-                        style={{ width: "100%", padding: 4 }}
-                        value={form.username}
-                        onChange={(e) => updateField("username", e.target.value)}
-                        required
-                    />
-                </div>
+                    <Form onSubmit={onSubmit}>
+                        <Form.Group className="mb-3" controlId="username">
+                            <Form.Label>Username</Form.Label>
+                            <Form.Control
+                                type="text"
+                                value={form.username}
+                                onChange={(e) =>
+                                    updateField("username", e.target.value)
+                                }
+                                required
+                            />
+                        </Form.Group>
 
-                <div style={{ marginBottom: 8 }}>
-                    <label style={{ display: "block", marginBottom: 4 }}>Email</label>
-                    <input
-                        type="email"
-                        style={{ width: "100%", padding: 4 }}
-                        value={form.email}
-                        onChange={(e) => updateField("email", e.target.value)}
-                        required
-                    />
-                </div>
+                        <Form.Group className="mb-3" controlId="email">
+                            <Form.Label>Email</Form.Label>
+                            <Form.Control
+                                type="email"
+                                value={form.email}
+                                onChange={(e) =>
+                                    updateField("email", e.target.value)
+                                }
+                                required
+                            />
+                        </Form.Group>
 
-                <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
-                    <div style={{ flex: 1 }}>
-                        <label style={{ display: "block", marginBottom: 4 }}>Name</label>
-                        <input
-                            style={{ width: "100%", padding: 4 }}
-                            value={form.name}
-                            onChange={(e) => updateField("name", e.target.value)}
-                            required
-                        />
+                        <Row className="mb-3">
+                            <Col>
+                                <Form.Group controlId="name">
+                                    <Form.Label>Name</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        value={form.name}
+                                        onChange={(e) =>
+                                            updateField("name", e.target.value)
+                                        }
+                                        required
+                                    />
+                                </Form.Group>
+                            </Col>
+                            <Col>
+                                <Form.Group controlId="surname">
+                                    <Form.Label>Surname</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        value={form.surname}
+                                        onChange={(e) =>
+                                            updateField(
+                                                "surname",
+                                                e.target.value
+                                            )
+                                        }
+                                        required
+                                    />
+                                </Form.Group>
+                            </Col>
+                        </Row>
+
+                        <Form.Group className="mb-4" controlId="password">
+                            <Form.Label>Password</Form.Label>
+                            <Form.Control
+                                type="password"
+                                value={form.password}
+                                onChange={(e) =>
+                                    updateField(
+                                        "password",
+                                        e.target.value
+                                    )
+                                }
+                                required
+                            />
+                        </Form.Group>
+
+                        <Button
+                            variant="primary"
+                            type="submit"
+                            className="w-100"
+                            disabled={loading}
+                        >
+                            {loading ? "Creating..." : "Register"}
+                        </Button>
+                    </Form>
+
+                    <div className="text-center mt-3">
+                        Have an account?{" "}
+                        <Link to="/login">
+                            Log in
+                        </Link>
                     </div>
-
-                    <div style={{ flex: 1 }}>
-                        <label style={{ display: "block", marginBottom: 4 }}>Surname</label>
-                        <input
-                            style={{ width: "100%", padding: 4 }}
-                            value={form.surname}
-                            onChange={(e) => updateField("surname", e.target.value)}
-                            required
-                        />
-                    </div>
-                </div>
-
-                <div style={{ marginBottom: 8 }}>
-                    <label style={{ display: "block", marginBottom: 4 }}>Password</label>
-                    <input
-                        type="password"
-                        style={{ width: "100%", padding: 4 }}
-                        value={form.password}
-                        onChange={(e) => updateField("password", e.target.value)}
-                        required
-                    />
-                </div>
-
-                <button type="submit" disabled={loading}>
-                    {loading ? "Creating..." : "Register"}
-                </button>
-            </form>
-
-            <p style={{ marginTop: 8 }}>
-                Have an account?{" "}
-                <Link to="/login">
-                    Log in
-                </Link>
-            </p>
-        </div>
+                </Card.Body>
+            </Card>
+        </Container>
     );
 }
