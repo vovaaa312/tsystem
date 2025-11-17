@@ -12,7 +12,7 @@ services:
       - ./frontend/tsystem-frontend:/app
       - /app/node_modules
 #    environment:
-#      - VITE_API_URL=http://localhost:8080/api  # или твой бэк
+#      - VITE_API_URL=http://localhost:8080/api
     depends_on:
       - postgres
       - logstash

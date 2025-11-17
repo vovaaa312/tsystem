@@ -1,7 +1,7 @@
 // src/App.tsx
 import "bootstrap/dist/css/bootstrap.min.css";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "./contexts/AuthContext";
+import {BrowserRouter, Routes, Route, Navigate} from "react-router-dom";
+import {AuthProvider} from "./contexts/AuthContext";
 import LoginForm from "./components/LoginForm";
 import RegisterForm from "./components/RegisterForm";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -17,38 +17,33 @@ function App() {
     return (
         <AuthProvider>
             <BrowserRouter>
-                <Header />
+                <Header/>
                 <Routes>
-                    <Route path="/login" element={<LoginForm />} />
-                    <Route path="/register" element={<RegisterForm />} />
+                    <Route path="/login" element={<LoginForm/>}/>
+                    <Route path="/register" element={<RegisterForm/>}/>
                     <Route
                         path="/reset-password-request"
-                        element={<ResetRequest />}
+                        element={<ResetRequest/>}
                     />
                     <Route
                         path="/reset-password"
-                        element={<ResetPassword />}
+                        element={<ResetPassword/>}
                     />
 
-                    <Route element={<ProtectedRoute />}>
+                    <Route element={<ProtectedRoute/>}>
                         <Route
                             path="/"
-                            element={<Navigate to="/projects" replace />}
+                            element={<Navigate to="/projects" replace/>}
                         />
-                        <Route path="/projects" element={<ProjectsPage />} />
-                        <Route path="/tickets" element={<TicketsPage />} />
+                        <Route path="/projects" element={<ProjectsPage/>}/>
                         <Route
-                            path="/admin/generate-data"
-                            element={<GenerateDataPage />}
+                            path="/projects/:projectId/tickets"
+                            element={<TicketsPage />}
                         />
-                        <Route
-                            path="/change-password"
-                            element={<ChangePassword />}
-                        />
-                        <Route
-                            path="*"
-                            element={<Navigate to="/projects" replace />}
-                        />
+                        <Route path="/tickets" element={<TicketsPage/>}/>
+                        <Route path="/admin/generate-data" element={<GenerateDataPage/>}/>
+                        <Route path="/change-password" element={<ChangePassword/>}/>
+                        <Route path="*" element={<Navigate to="/projects" replace/>}/>
                     </Route>
                 </Routes>
             </BrowserRouter>
